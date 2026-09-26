@@ -3,25 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MindAR Image Tracking — A-Frame</title>
+  <title>MindAR — Ложка на маркере</title>
 
-  <!-- A-Frame (основная библиотека) -->
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-
-  <!-- MindAR: плагин для A-Frame (image tracking) -->
   <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 
   <style>
-    body {
-      margin: 0;
-      overflow: hidden;
-    }
-
-    /* Оверлей с инструкцией, пока камера не направлена на маркер */
+    body { margin: 0; overflow: hidden; }
     #overlay {
       position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
+      inset: 0;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -34,28 +25,13 @@
       pointer-events: none;
       transition: opacity 0.5s;
     }
-    #overlay.hidden {
-      opacity: 0;
-    }
+    #overlay.hidden { opacity: 0; }
   </style>
 </head>
 <body>
 
-  <!-- Инструкция для пользователя -->
-  <div id="overlay">
-    Наведите камеру на изображение-маркер
-  </div>
+  <div id="overlay">Наведите камеру на изображение-маркер</div>
 
-  <!--
-    A-Frame сцена с компонентом MindAR image tracking.
-    Атрибуты:
-      imageTargetSrc  — путь к скомпилированному файлу targets.mind
-      uiLoading       — текст во время загрузки
-      uiScanning      — текст во время сканирования
-      uiError         — текст при ошибке
-      filterMinCF     — минимальный коэффициент уверенности (фильтр)
-      filterBeta      — параметр сглаживания
-  -->
   <a-scene
     mindar-image="
       imageTargetSrc: ./targets.mind;
@@ -66,97 +42,61 @@
       filterBeta: 10000;
     "
     color-space="sRGB"
-    renderer="colorManagement: true, physicallyCorrectLights: true"
+    renderer="colorManagement: true; physicallyCorrectLights: true"
     vr-mode-ui="enabled: false"
     device-orientation-permission-ui="enabled: false"
   >
 
-    <!-- ======================== -->
-    <!--   ОСВЕЩЕНИЕ СЦЕНЫ       -->
-    <!-- ======================== -->
+    <!-- Освещение -->
+    <a-light type="ambient" color="#ffffff" intensity="0.6"></a-light>
+    <a-light type="directional" color="#ffffff" intensity="1.2" position="2 4 3"></a-light>
+    <a-light type="point" color="#ffeedd" intensity="0.5" position="-1 2 1"></a-light>
 
-    <!-- Мягкий общий (ambient) свет -->
-    <a-light type="ambient" color="#ffffff" intensity="0.5"></a-light>
-
-    <!-- Направленный свет (имитация солнца) с тенями -->
-    <a-light
-      type="directional"
-      color="#ffffff"
-      intensity="1.2"
-      position="2 4 3"
-      castShadow="true"
-    ></a-light>
-
-    <!-- Точечный свет для дополнительной подсветки модели -->
-    <a-light
-      type="point"
-      color="#ffeedd"
-      intensity="0.6"
-      position="-1 2 1"
-    ></a-light>
-
-    <!-- ======================== -->
-    <!--   КАМЕРА                -->
-    <!-- ======================== -->
+    <!-- Камера -->
     <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-    <!-- ======================================== -->
-    <!--   IMAGE TARGET (index 0 — первый маркер) -->
-    <!-- ======================================== -->
-    <!--
-      Компонент mindar-image-target="targetIndex: 0" привязывает
-      дочерние объекты к первому изображению в targets.mind.
-      При обнаружении маркера дочерние объекты становятся видимыми;
-      при потере — скрываются.
-    -->
+    <!-- Маркер (первое изображение в targets.mind) -->
     <a-entity mindar-image-target="targetIndex: 0">
 
       <!--
-        3D-модель в формате glTF / GLB.
-        Замените src на путь к вашей модели.
-        Ниже используется публичная модель для демонстрации.
+        Модель ложки, собранная из примитивов A-Frame.
+        - Ручка: длинный тонкий цилиндр
+        - Черпало: сплюснутая сфера
       -->
-      <a-entity
-        id="model"
-        gltf-model="https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/DamagedHelmet/glTF-Binary/DamagedHelmet.glb"
-        scale="0.3 0.3 0.3"
-        position="0 0 0"
-        rotation="0 0 0"
-        animation="property: rotation; to: 0 360 0; loop: true; dur: 8000; easing: linear"
-      ></a-entity>
+      <a-entity position="0 0 0" rotation="-90 0 0">
 
-      <!--
-        Опционально: полупрозрачная плоскость-подложка,
-        чтобы визуально обозначить область маркера
-      -->
-      <a-plane
-        color="#ffffff"
-        opacity="0.15"
-        position="0 0 -0.01"
-        width="1"
-        height="1"
-      ></a-plane>
+        <!-- Ручка ложки -->
+        <a-cylinder
+          color="#c0c0c0"
+          radius="0.02"
+          height="0.6"
+          position="0 0.3 0"
+          material="metalness: 0.9; roughness: 0.2"
+        ></a-cylinder>
+
+        <!-- Черпало ложки (сплюснутая сфера) -->
+        <a-sphere
+          color="#d0d0d0"
+          radius="0.08"
+          scale="1 0.3 1.4"
+          position="0 0 0"
+          material="metalness: 0.9; roughness: 0.2"
+        ></a-sphere>
+
+      </a-entity>
 
     </a-entity>
 
   </a-scene>
 
-  <!-- Скрипт: скрытие оверлея при обнаружении маркера -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const overlay = document.getElementById('overlay');
       const target  = document.querySelector('[mindar-image-target]');
 
       if (target) {
-        // Событие "targetFound" — маркер обнаружен
-        target.addEventListener('targetFound', () => {
-          overlay.classList.add('hidden');
-        });
-
-        // Событие "targetLost" — маркер потерян
-        target.addEventListener('targetLost', () => {
-          overlay.classList.remove('hidden');
-        });
+        target.addEventListener('targetFound', () => overlay.classList.add('hidden'));
+        target.addEventListener('targetLost',  () => overlay.classList.remove('hidden'));
       }
     });
   </script>
